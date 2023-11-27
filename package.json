@@ -1,0 +1,18 @@
+{
+  "name": "com.pluginset.applovin",
+  "displayName": "PluginSet AppLovin",
+  "version": "6.0.1",
+  "unity": "2018.4",
+  "description": "AppLovin https://dash.applovin.com/documentation/mediation/unity/getting-started/integration",
+  "keywords": [
+    "pluginset",
+    "applovin"
+  ],
+  "dependencies": {
+    "com.pluginset.core": "1.0.0"
+  },
+  "author": {
+    "name": "LyneXiao",
+    "email": "lixonxs@icloud.com"
+  }
+}
