@@ -339,7 +339,14 @@ namespace AppLovinMax.Scripts.IntegrationManager.Editor
         /// <param name="mediationPluginParentDirectory">The parent directory of where the mediation adapter plugins are imported to.</param>
         public static void UpdateCurrentVersions(Network network, string mediationPluginParentDirectory)
         {
+#if false
             var dependencyFilePath = Path.Combine(mediationPluginParentDirectory, network.DependenciesFilePath);
+#else
+            var paths = network.DependenciesFilePath.Split('/');
+            var newPaths = new List<string>(paths);
+            newPaths.RemoveAt(0);
+            var dependencyFilePath = Path.Combine(mediationPluginParentDirectory, "..", "..", "..", "Dependencies", string.Join("/", newPaths));
+#endif
             var currentVersions = GetCurrentVersions(dependencyFilePath);
 
             network.CurrentVersions = currentVersions;

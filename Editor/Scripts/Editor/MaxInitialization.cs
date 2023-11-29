@@ -14,7 +14,9 @@ using UnityEditor;
 
 namespace AppLovinMax.Scripts.Editor
 {
+#if false
     [InitializeOnLoad]
+#endif
     public class MaxInitialize
     {
         private static readonly List<string> ObsoleteNetworks = new List<string>

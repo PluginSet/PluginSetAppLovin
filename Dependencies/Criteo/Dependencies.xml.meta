@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: e7e9c84563b444c6ba1e334602e5e7ae
+labels:
+- al_max
+- al_max_export_path-MaxSdk/Backup/Criteo/Editor/Dependencies.xml
+- al_max_export_path-MaxSdk/Mediation/Criteo/Editor/Dependencies.xml
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

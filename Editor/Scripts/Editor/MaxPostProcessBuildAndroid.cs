@@ -6,7 +6,7 @@
 //  Copyright © 2020 AppLovin. All rights reserved.
 //
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID && ENABLE_APPLOVIN
 using AppLovinMax.Scripts.IntegrationManager.Editor;
 using System;
 using System.Collections.Generic;
@@ -139,7 +139,8 @@ namespace AppLovinMax.Scripts.Editor
                 return;
             }
 
-            var metaDataElements = elementApplication.Descendants().Where(element => element.Name.LocalName.Equals("meta-data"));
+            var metaDataElements =
+ elementApplication.Descendants().Where(element => element.Name.LocalName.Equals("meta-data"));
 
             AddSdkKeyIfNeeded(elementApplication);
             EnableVerboseLoggingIfNeeded(elementApplication);

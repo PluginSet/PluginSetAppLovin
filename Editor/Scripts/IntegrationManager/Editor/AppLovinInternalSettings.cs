@@ -9,6 +9,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using PluginSet.AppLovin.Editor;
+using PluginSet.Core.Editor;
+using UnityEditor;
 using UnityEngine;
 
 namespace AppLovinMax.Scripts.IntegrationManager.Editor
@@ -52,6 +55,7 @@ namespace AppLovinMax.Scripts.IntegrationManager.Editor
         {
             get
             {
+#if false
                 if (instance != null) return instance;
 
                 instance = CreateInstance<AppLovinInternalSettings>();
@@ -73,11 +77,15 @@ namespace AppLovinMax.Scripts.IntegrationManager.Editor
 
                 JsonUtility.FromJsonOverwrite(settingsJson, instance);
                 return instance;
+#else
+                return EditorSetting.CurrentBuildChannel.Get<AppLovinInternalParams>();
+#endif
             }
         }
 
         public void Save()
         {
+#if false
             var settingsJson = JsonUtility.ToJson(instance);
             try
             {
@@ -90,6 +98,9 @@ namespace AppLovinMax.Scripts.IntegrationManager.Editor
                 MaxSdkLogger.UserError("Failed to save internal settings.");
                 Console.WriteLine(exception);
             }
+#else
+            EditorUtility.SetDirty(EditorSetting.CurrentBuildChannel);
+#endif
         }
 
         /// <summary>

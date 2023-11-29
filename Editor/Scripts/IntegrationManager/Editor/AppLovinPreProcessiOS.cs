@@ -6,7 +6,7 @@
 //  Copyright © 2023 AppLovin. All rights reserved.
 //
 
-#if UNITY_IOS
+#if UNITY_IOS && ENABLE_APPLOVIN
 
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;

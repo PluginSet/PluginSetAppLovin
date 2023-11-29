@@ -6,6 +6,7 @@
 //  Copyright © 2019 AppLovin. All rights reserved.
 //
 
+#if true
 using UnityEditor;
 using UnityEngine;
 
@@ -58,3 +59,5 @@ namespace AppLovinMax.Scripts.IntegrationManager.Editor
         }
     }
 }
+
+#endif

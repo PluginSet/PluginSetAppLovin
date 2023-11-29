@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: 517e4143934164ba495f185bdd46908c
+labels:
+- al_max
+- al_max_export_path-MaxSdk/Backup/Nend/Editor/Dependencies.xml
+- al_max_export_path-MaxSdk/Mediation/Nend/Editor/Dependencies.xml
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

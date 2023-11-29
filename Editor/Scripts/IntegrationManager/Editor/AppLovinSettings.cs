@@ -8,6 +8,8 @@
 
 using AppLovinMax.Scripts.IntegrationManager.Editor;
 using System.IO;
+using PluginSet.AppLovin.Editor;
+using PluginSet.Core.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -85,6 +87,7 @@ public class AppLovinSettings : ScriptableObject
     {
         get
         {
+#if false
             if (instance == null)
             {
                 // Check for an existing AppLovinSettings somewhere in the project
@@ -133,6 +136,9 @@ public class AppLovinSettings : ScriptableObject
             }
 
             return instance;
+#else
+            return EditorSetting.CurrentBuildChannel.Get<AppLovinParams>();
+#endif
         }
     }
 
@@ -385,6 +391,10 @@ public class AppLovinSettings : ScriptableObject
     /// </summary>
     public void SaveAsync()
     {
+#if false
         EditorUtility.SetDirty(instance);
+#else
+        EditorUtility.SetDirty(EditorSetting.CurrentBuildChannel);
+#endif
     }
 }

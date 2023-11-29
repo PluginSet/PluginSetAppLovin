@@ -6,7 +6,7 @@
 //  Copyright © 2019 AppLovin. All rights reserved.
 //
 
-#if UNITY_IOS || UNITY_IPHONE
+#if (UNITY_IOS || UNITY_IPHONE) && ENABLE_APPLOVIN
 
 using System.Text;
 using UnityEngine.Networking;

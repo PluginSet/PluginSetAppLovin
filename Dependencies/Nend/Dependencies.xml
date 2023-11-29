@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dependencies>
+    <androidPackages>
+        <androidPackage spec="com.applovin.mediation:nend-adapter:10.0.0.0">
+            <repositories>
+                <repository>https://fan-adn.github.io/nendSDK-Android-lib/library</repository>
+            </repositories>
+        </androidPackage>
+    </androidPackages>
+    <iosPods>
+        <iosPod name="AppLovinMediationNendAdapter" version="8.2.0.0"/>
+    </iosPods>
+</dependencies>

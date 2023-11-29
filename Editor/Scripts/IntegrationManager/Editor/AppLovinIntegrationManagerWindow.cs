@@ -193,6 +193,7 @@ namespace AppLovinMax.Scripts.IntegrationManager.Editor
 
                 DrawPluginDetails();
 
+#if false
                 if (pluginData != null && pluginData.PartnerMicroSdks != null)
                 {
                     EditorGUILayout.LabelField("AppLovin Micro SDK Partners", titleLabelStyle);
@@ -207,6 +208,7 @@ namespace AppLovinMax.Scripts.IntegrationManager.Editor
                 }
 
                 DrawMediatedNetworks();
+#endif
 
                 // Draw AppLovin Quality Service settings
                 EditorGUILayout.LabelField("SDK Settings", titleLabelStyle);
@@ -311,10 +313,12 @@ namespace AppLovinMax.Scripts.IntegrationManager.Editor
                     GUILayout.FlexibleSpace();
 
                     GUI.enabled = upgradeButtonEnabled;
+#if false
                     if (GUILayout.Button(new GUIContent("Upgrade"), fieldWidth))
                     {
                         AppLovinEditorCoroutine.StartCoroutine(AppLovinIntegrationManager.Instance.DownloadPlugin(appLovinMax));
                     }
+#endif
 
                     GUI.enabled = true;
                     GUILayout.Space(5);

@@ -6,7 +6,7 @@
 //  Copyright © 2020 AppLovin. All rights reserved.
 //
 
-#if UNITY_IOS || UNITY_IPHONE
+#if (UNITY_IOS || UNITY_IPHONE) && ENABLE_APPLOVIN
 
 using AppLovinMax.Scripts.IntegrationManager.Editor;
 #if UNITY_2019_3_OR_NEWER

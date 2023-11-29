@@ -6,7 +6,7 @@
 //  Copyright © 2019 AppLovin. All rights reserved.
 //
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID && ENABLE_APPLOVIN
 
 using System.Linq;
 using System;
