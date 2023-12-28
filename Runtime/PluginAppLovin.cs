@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using PluginSet.Core;
 
 namespace PluginSet.AppLovin
@@ -88,6 +89,34 @@ namespace PluginSet.AppLovin
         public bool IsEnableShowBanner => _inited;
         
         private List<string> _showingBannerAdIds = new List<string>();
+
+        private MaxSdkBase.BannerPosition ConvertPosition(BannerPosition position)
+        {
+            switch (position)
+            {
+                case BannerPosition.TopLeft:
+                    return MaxSdkBase.BannerPosition.TopLeft;
+                case BannerPosition.TopCenter:
+                    return MaxSdkBase.BannerPosition.TopCenter;
+                case BannerPosition.TopRight:
+                    return MaxSdkBase.BannerPosition.TopRight;
+                case BannerPosition.Centered:
+                    return MaxSdkBase.BannerPosition.Centered;
+                case BannerPosition.BottomLeft:
+                    return MaxSdkBase.BannerPosition.BottomLeft;
+                case BannerPosition.BottomCenter:
+                    return MaxSdkBase.BannerPosition.BottomCenter;
+                case BannerPosition.BottomRight:
+                    return MaxSdkBase.BannerPosition.BottomRight;
+                case BannerPosition.CenterLeft:
+                    return MaxSdkBase.BannerPosition.CenterLeft;
+                case BannerPosition.CenterRight:
+                    return MaxSdkBase.BannerPosition.CenterRight;
+                default:
+                    return MaxSdkBase.BannerPosition.BottomCenter;
+            }
+        }
+        
         public void ShowBannerAd(string adId, BannerPosition position = BannerPosition.BottomCenter, Dictionary<string, object> extensions = null)
         {
             if (string.IsNullOrEmpty(adId))
@@ -96,6 +125,8 @@ namespace PluginSet.AppLovin
             if (_showingBannerAdIds.Contains(adId))
                 return;
             
+            _showingBannerAdIds.Add(adId);
+            MaxSdk.CreateBanner(adId, ConvertPosition(position));
             MaxSdk.ShowBanner(adId);
         }
 
@@ -105,6 +136,7 @@ namespace PluginSet.AppLovin
                 adId = _bannerAdUnitId;
             
             MaxSdk.HideBanner(adId);
+            MaxSdk.DestroyBanner(adId);
             
             if (_showingBannerAdIds.Contains(adId))
                 _showingBannerAdIds.Remove(adId);
@@ -115,6 +147,7 @@ namespace PluginSet.AppLovin
             foreach (var id in _showingBannerAdIds)
             {
                 MaxSdk.HideBanner(id);
+                MaxSdk.DestroyBanner(id);
             }
             _showingBannerAdIds.Clear();
         }
