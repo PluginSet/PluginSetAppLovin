@@ -11,5 +11,7 @@ namespace PluginSet.AppLovin
         public string RewardAdUnitId;
         
         public string InterstitialAdUnitId;
+        
+        public string OpenAdUnitId;
     }
 }

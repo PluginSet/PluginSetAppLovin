@@ -27,6 +27,7 @@ namespace PluginSet.AppLovin.Editor
             config.BannerAdUnitId = buildParams.BannerAdUnitId;
             config.RewardAdUnitId = buildParams.RewardAdUnitId;
             config.InterstitialAdUnitId = buildParams.InterstitialAdUnitId;
+            config.OpenAdUnitId = buildParams.AppOpenAdUnitId;
             
             Global.CopyDependenciesInLib("com.pluginset.applovin", "Dependencies", delegate(string name)
             {

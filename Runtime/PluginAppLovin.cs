@@ -8,7 +8,7 @@ using PluginSet.Core;
 namespace PluginSet.AppLovin
 {
     [PluginRegister]
-    public class PluginAppLovin : PluginBase, IStartPlugin, IBannerAdPlugin, IRewardAdPlugin, IInterstitialAdPlugin
+    public class PluginAppLovin : PluginBase, IStartPlugin, IBannerAdPlugin, IOpenAdPlugin, IRewardAdPlugin, IInterstitialAdPlugin
     {
         private static readonly Logger Logger = LoggerManager.GetLogger("AppLovin");
         public override string Name => "AppLovin";
@@ -22,6 +22,7 @@ namespace PluginSet.AppLovin
         private string _bannerAdUnitId;
         private string _rewardAdUnitId;
         private string _interstitialAdUnitId;
+        private string _openAdUnitId;
         
         private Action _onRewardAdLoadedSuccess;
         private Action<int> _onRewardAdLoadedFail;
@@ -37,6 +38,14 @@ namespace PluginSet.AppLovin
         private bool _isLoadingInterstitialAd;
         private bool _isShowingInterstitialAd;
         
+        
+        private bool _isLoadingOpenAd;
+        private bool _isShowingOpenAd;
+
+        private Action _onOpenAdLoadedSuccess;
+        private Action<int> _onOpenAdLoadedFail;
+        private Action<bool, int> _onOpenAdCallback;
+        
         protected override void Init(PluginSetConfig config)
         {
             var cfg = config.Get<PluginAppLovinConfig>();
@@ -44,6 +53,7 @@ namespace PluginSet.AppLovin
             _bannerAdUnitId = cfg.BannerAdUnitId;
             _rewardAdUnitId = cfg.RewardAdUnitId;
             _interstitialAdUnitId = cfg.InterstitialAdUnitId;
+            _openAdUnitId = cfg.OpenAdUnitId;
             
             MaxSdkCallbacks.OnSdkInitializedEvent += InitializeMax;
         }
@@ -79,8 +89,15 @@ namespace PluginSet.AppLovin
             MaxSdkCallbacks.Interstitial.OnAdClickedEvent += OnInterstitialClickedEvent;
             MaxSdkCallbacks.Interstitial.OnAdHiddenEvent += OnInterstitialHiddenEvent;
             MaxSdkCallbacks.Interstitial.OnAdDisplayFailedEvent += OnInterstitialAdFailedToDisplayEvent;
+            
+            MaxSdkCallbacks.AppOpen.OnAdLoadedEvent += OnOpenAdLoadedEvent;
+            MaxSdkCallbacks.AppOpen.OnAdLoadFailedEvent += OnOpenAdLoadFailedEvent;
+            MaxSdkCallbacks.AppOpen.OnAdDisplayedEvent += OnOpenAdDisplayedEvent;
+            MaxSdkCallbacks.AppOpen.OnAdClickedEvent += OnOpenAdClickedEvent;
+            MaxSdkCallbacks.AppOpen.OnAdHiddenEvent += OnOpenAdHiddenEvent;
+            MaxSdkCallbacks.AppOpen.OnAdDisplayFailedEvent += OnOpenAdFailedToDisplayEvent;
         }
-
+        
         public void DisposePlugin(bool isAppQuit = false)
         {
         }
@@ -154,7 +171,7 @@ namespace PluginSet.AppLovin
 #endregion
 
 #region Reward Ad
-        public bool IsEnableShowRewardAd => true;
+        public bool IsEnableShowRewardAd => _inited;
         public bool IsReadyToShowRewardAd => _inited && MaxSdk.IsRewardedAdReady(_rewardAdUnitId);
         public void LoadRewardAd(Action success = null, Action<int> fail = null)
         {
@@ -219,7 +236,7 @@ namespace PluginSet.AppLovin
 #endregion
 
 #region Interstitial Ad
-        public bool IsEnableShowInterstitialAd => true;
+        public bool IsEnableShowInterstitialAd => _inited;
         public bool IsReadyToShowInterstitialAd => _inited && MaxSdk.IsInterstitialReady(_interstitialAdUnitId);
         public void LoadInterstitialAd(Action success = null, Action<int> fail = null)
         {
@@ -280,6 +297,79 @@ namespace PluginSet.AppLovin
             
             Logger.Debug($"Show Interstitial Ad {_interstitialAdUnitId}");
             MaxSdk.ShowInterstitial(_interstitialAdUnitId);
+        }
+#endregion
+
+#region open ad
+
+        public bool IsEnableShowOpenAd => _inited;
+        public bool IsReadyToShowOpenAd => MaxSdk.IsAppOpenAdReady(_openAdUnitId);
+        public void LoadOpenAd(Action success = null, Action<int> fail = null, Dictionary<string, object> extParams = null)
+        {
+            if (!_inited)
+            {
+                fail?.Invoke(PluginConstants.InvalidCode);
+                return;
+            }
+            
+            if (IsReadyToShowOpenAd)
+            {
+                success?.Invoke();
+                return;
+            }
+            
+            if (_isLoadingOpenAd)
+            {
+                fail?.Invoke((int)AdErrorCode.IsLoading);
+                return;
+            }
+            
+            if (_isShowingOpenAd)
+            {
+                fail?.Invoke((int)AdErrorCode.IsShowing);
+                return;
+            }
+            
+            _onOpenAdLoadedSuccess = success;
+            _onOpenAdLoadedFail = fail;
+            _isLoadingOpenAd = true;
+            
+            Logger.Debug($"Load open Ad {_openAdUnitId}");
+            if (extParams != null)
+            {
+                foreach (var kv in extParams)
+                {
+                    MaxSdk.SetAppOpenAdExtraParameter(_openAdUnitId, kv.Key, kv.Value.ToString());
+                }
+            }
+            MaxSdk.LoadAppOpenAd(_openAdUnitId);
+        }
+
+        public void ShowOpenAd(Action<bool, int> dismiss = null)
+        {
+            if (!_inited)
+            {
+                dismiss?.Invoke(false, PluginConstants.InvalidCode);
+                return;
+            }
+            
+            if (!IsReadyToShowOpenAd)
+            {
+                dismiss?.Invoke(false, (int)AdErrorCode.NotLoaded);
+                return;
+            }
+            
+            if (_isShowingOpenAd)
+            {
+                dismiss?.Invoke(false, (int)AdErrorCode.IsShowing);
+                return;
+            }
+            
+            _isShowingOpenAd = true;
+            _onOpenAdCallback = dismiss;
+            
+            Logger.Debug($"Show AppOpen Ad {_openAdUnitId}");
+            MaxSdk.ShowAppOpenAd(_openAdUnitId);
         }
 #endregion
 
@@ -396,6 +486,61 @@ namespace PluginSet.AppLovin
             _onInterstitialCallback.Invoke(false, (int)AdErrorCode.ShowFail);
             _onInterstitialCallback = null;
         }
+
+        private void OnOpenAdLoadedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
+        {
+            Logger.Debug($"[MAX OPEN AD] Loaded, adUnitId = {adUnitId}");
+            
+            _isLoadingOpenAd = false;
+            var callback = _onOpenAdLoadedSuccess;
+            _onOpenAdLoadedSuccess = null;
+            _onOpenAdLoadedFail = null;
+            callback?.Invoke();
+        }
+
+        private void OnOpenAdLoadFailedEvent(string adUnitId, MaxSdkBase.ErrorInfo adInfo)
+        {
+            Logger.Debug($"[MAX OPEN AD] Failed to load, adUnitId = {adUnitId}");
+            
+            _isLoadingOpenAd = false;
+            var callback = _onOpenAdLoadedFail;
+            _onOpenAdLoadedSuccess = null;
+            _onOpenAdLoadedFail = null;
+            callback?.Invoke((int)AdErrorCode.NotLoaded);
+        }
+
+        private void OnOpenAdDisplayedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
+        {
+            Logger.Debug($"[MAX OPEN AD] Displayed, adUnitId = {adUnitId}");
+        }
+
+        private void OnOpenAdClickedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
+        {
+        }
+
+        private void OnOpenAdHiddenEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
+        {
+            Logger.Debug($"[MAX OPEN AD] Dismissed, adUnitId = {adUnitId}");
+            
+            _isShowingOpenAd = false;
+            if (_onOpenAdCallback == null) return;
+            
+            _onOpenAdCallback.Invoke(true, (int)AdErrorCode.Success);
+            _onOpenAdCallback = null;
+        }
+        
+        private void OnOpenAdFailedToDisplayEvent(string adUnitId, MaxSdkBase.ErrorInfo errorInfo, MaxSdkBase.AdInfo adInfo)
+        {
+            Logger.Debug($"[MAX OPEN AD] Failed to display, adUnitId = {adUnitId}");
+            
+            _isShowingOpenAd = false;
+            if (_onOpenAdCallback == null) return;
+
+            _onOpenAdCallback.Invoke(false, (int)AdErrorCode.ShowFail);
+            _onOpenAdCallback = null;
+        }
+
+
     }
 }
 #endif

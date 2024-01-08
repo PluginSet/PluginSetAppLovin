@@ -22,6 +22,10 @@ namespace PluginSet.AppLovin.Editor
         [VisibleCaseBoolValue("Enable", true)]
         [Tooltip("插屏广告ID")]
         public string InterstitialAdUnitId;
+        
+        [VisibleCaseBoolValue("Enable", true)]
+        [Tooltip("开屏广告ID")]
+        public string AppOpenAdUnitId;
 
         [VisibleCaseBoolValue("Enable", true)]
         public bool IncludeAdColony;
