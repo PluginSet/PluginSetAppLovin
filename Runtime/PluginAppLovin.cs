@@ -1,4 +1,4 @@
-#if ENABLE_APPLOVIN
+#if  true// ENABLE_APPLOVIN
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,6 +27,7 @@ namespace PluginSet.AppLovin
         private Action _onRewardAdLoadedSuccess;
         private Action<int> _onRewardAdLoadedFail;
         private Action<bool, int> _onRewardCallback;
+        private AdInfo _loadedRewardAdInfo;
         
         private bool _isLoadingRewardAd;
         private bool _isShowingRewardAd;
@@ -34,6 +35,7 @@ namespace PluginSet.AppLovin
         private Action _onInterstitialAdLoadedSuccess;
         private Action<int> _onInterstitialAdLoadedFail;
         private Action<bool, int> _onInterstitialCallback;
+        private AdInfo _loadedInterstitialAdInfo;
         
         private bool _isLoadingInterstitialAd;
         private bool _isShowingInterstitialAd;
@@ -45,6 +47,7 @@ namespace PluginSet.AppLovin
         private Action _onOpenAdLoadedSuccess;
         private Action<int> _onOpenAdLoadedFail;
         private Action<bool, int> _onOpenAdCallback;
+        private AdInfo _loadedOpenAdInfo;
         
         protected override void Init(PluginSetConfig config)
         {
@@ -233,7 +236,13 @@ namespace PluginSet.AppLovin
             Logger.Debug($"Show Reward Ad {_rewardAdUnitId}");
             MaxSdk.ShowRewardedAd(_rewardAdUnitId);
         }
-#endregion
+
+        public AdInfo GetLoadedRewardAdInfo()
+        {
+            return _loadedRewardAdInfo;
+        }
+
+        #endregion
 
 #region Interstitial Ad
         public bool IsEnableShowInterstitialAd => _inited;
@@ -298,7 +307,13 @@ namespace PluginSet.AppLovin
             Logger.Debug($"Show Interstitial Ad {_interstitialAdUnitId}");
             MaxSdk.ShowInterstitial(_interstitialAdUnitId);
         }
-#endregion
+
+        public AdInfo GetLoadedInterstitialAdInfo()
+        {
+            return _loadedInterstitialAdInfo;
+        }
+
+        #endregion
 
 #region open ad
 
@@ -371,11 +386,25 @@ namespace PluginSet.AppLovin
             Logger.Debug($"Show AppOpen Ad {_openAdUnitId}");
             MaxSdk.ShowAppOpenAd(_openAdUnitId);
         }
-#endregion
+
+        public AdInfo GetLoadedOpenAdInfo()
+        {
+            return _loadedOpenAdInfo;
+        }
+
+        #endregion
 
         private void OnRewardedAdLoadedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
             Logger.Debug($"[MAX REWARDED AD] Loaded, adUnitId = {adUnitId}");
+
+            _loadedRewardAdInfo = new AdInfo()
+            {
+                AdUnitId = adUnitId,
+                Plugin = Name,
+                Revenue = adInfo.Revenue,
+                RevenuePrecision = adInfo.RevenuePrecision
+            };
             
             _isLoadingRewardAd = false;
             var callback = _onRewardAdLoadedSuccess;
@@ -397,7 +426,7 @@ namespace PluginSet.AppLovin
 
         private void OnRewardedAdDisplayedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
-            Logger.Debug($"[MAX REWARDED AD] Displayed, adUnitId = {adUnitId}");
+            Logger.Debug($"[MAX REWARDED AD] Displayed: {adInfo}");
         }
 
         private void OnRewardedAdClickedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
@@ -411,9 +440,7 @@ namespace PluginSet.AppLovin
             Logger.Debug($"[MAX REWARDED AD] Dismissed, adUnitId = {adUnitId}");
             
             _isShowingRewardAd = false;
-            if (_onRewardCallback != null)
-                _onRewardCallback.Invoke(false, (int)AdErrorCode.Dismissed);
-            _onRewardCallback = null;
+            HandRewardCallback(false, (int)AdErrorCode.Dismissed);
         }
 
         private void OnRewardedAdFailedToDisplayEvent(string adUnitId, MaxSdkBase.ErrorInfo errorInfo, MaxSdkBase.AdInfo adInfo)
@@ -421,23 +448,33 @@ namespace PluginSet.AppLovin
             Logger.Debug($"[MAX REWARDED AD] Failed to display, adUnitId = {adUnitId}");
             
             _isShowingRewardAd = false;
-            if (_onRewardCallback != null)
-                _onRewardCallback.Invoke(false, (int)AdErrorCode.ShowFail);
-            _onRewardCallback = null;
+            HandRewardCallback(false, (int)AdErrorCode.ShowFail);
         }
 
         private void OnRewardedAdReceivedRewardEvent(string adUnitId, MaxSdk.Reward reward, MaxSdkBase.AdInfo adInfo)
         {
             Logger.Debug($"[MAX REWARDED AD] Received reward, adUnitId = {adUnitId}");
-            
-            if (_onRewardCallback != null)
-                _onRewardCallback.Invoke(true, (int)AdErrorCode.Success);
+            HandRewardCallback(true, (int)AdErrorCode.Success);
+        }
+        
+        private void HandRewardCallback(bool result, int code)
+        {
+            var callback = _onRewardCallback;
             _onRewardCallback = null;
+            callback?.Invoke(result, code);
         }
 
         private void OnInterstitialLoadedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
             Logger.Debug($"[MAX INTERSTITIAL AD] Loaded, adUnitId = {adUnitId}");
+
+            _loadedInterstitialAdInfo = new AdInfo()
+            {
+                AdUnitId = adUnitId,
+                Plugin = Name,
+                Revenue = adInfo.Revenue,
+                RevenuePrecision = adInfo.RevenuePrecision
+            };
             
             _isLoadingInterstitialAd = false;
             var callback = _onInterstitialAdLoadedSuccess;
@@ -459,7 +496,7 @@ namespace PluginSet.AppLovin
 
         private void OnInterstitialDisplayedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
-            Logger.Debug($"[MAX INTERSTITIAL AD] Displayed, adUnitId = {adUnitId}");
+            Logger.Debug($"[MAX INTERSTITIAL AD] Displayed {adInfo}");
         }
 
         private void OnInterstitialClickedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
@@ -490,7 +527,14 @@ namespace PluginSet.AppLovin
         private void OnOpenAdLoadedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
             Logger.Debug($"[MAX OPEN AD] Loaded, adUnitId = {adUnitId}");
-            
+
+            _loadedOpenAdInfo = new AdInfo()
+            {
+                AdUnitId = adUnitId,
+                Plugin = Name,
+                Revenue = adInfo.Revenue,
+                RevenuePrecision = adInfo.RevenuePrecision,
+            };
             _isLoadingOpenAd = false;
             var callback = _onOpenAdLoadedSuccess;
             _onOpenAdLoadedSuccess = null;
@@ -511,7 +555,7 @@ namespace PluginSet.AppLovin
 
         private void OnOpenAdDisplayedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
         {
-            Logger.Debug($"[MAX OPEN AD] Displayed, adUnitId = {adUnitId}");
+            Logger.Debug($"[MAX OPEN AD] Displayed {adInfo}");
         }
 
         private void OnOpenAdClickedEvent(string adUnitId, MaxSdkBase.AdInfo adInfo)
