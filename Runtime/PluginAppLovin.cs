@@ -1,4 +1,4 @@
-#if  true// ENABLE_APPLOVIN
+#if ENABLE_APPLOVIN
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -207,6 +207,12 @@ namespace PluginSet.AppLovin
                 fail?.Invoke((int)AdErrorCode.IsShowing);
                 return;
             }
+
+            if (string.IsNullOrEmpty(_rewardAdUnitId))
+            {
+                fail?.Invoke((int)AdErrorCode.NotLoaded);
+                return;
+            }
             
             _onRewardAdLoadedSuccess = success;
             _onRewardAdLoadedFail = fail;
@@ -276,6 +282,12 @@ namespace PluginSet.AppLovin
             if (_isShowingInterstitialAd)
             {
                 fail?.Invoke((int)AdErrorCode.IsShowing);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_interstitialAdUnitId))
+            {
+                fail?.Invoke((int)AdErrorCode.NotLoaded);
                 return;
             }
             
@@ -348,6 +360,12 @@ namespace PluginSet.AppLovin
             if (_isShowingOpenAd)
             {
                 fail?.Invoke((int)AdErrorCode.IsShowing);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_openAdUnitId))
+            {
+                fail?.Invoke((int)AdErrorCode.NotLoaded);
                 return;
             }
             
