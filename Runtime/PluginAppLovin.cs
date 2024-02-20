@@ -142,6 +142,9 @@ namespace PluginSet.AppLovin
             if (string.IsNullOrEmpty(adId))
                 adId = _bannerAdUnitId;
 
+            if (string.IsNullOrEmpty(adId))
+                return;
+
             if (_showingBannerAdIds.Contains(adId))
                 return;
             
@@ -154,6 +157,9 @@ namespace PluginSet.AppLovin
         {
             if (string.IsNullOrEmpty(adId))
                 adId = _bannerAdUnitId;
+            
+            if (string.IsNullOrEmpty(adId))
+                return;
             
             MaxSdk.HideBanner(adId);
             MaxSdk.DestroyBanner(adId);
