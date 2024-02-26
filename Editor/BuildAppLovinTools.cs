@@ -134,6 +134,17 @@ namespace PluginSet.AppLovin.Editor
                 var appLovinConfig = context.BuildChannels.Get<AppLovinParams>();
                 projectManager.LibraryManifest.SetMetaData("com.google.android.gms.ads.APPLICATION_ID", appLovinConfig.AdMobAndroidAppId);
             }
+
+            if (buildParams.IncludeVungle)
+            {
+                var gradle1 = projectManager.LibraryGradle;
+                var node1 = gradle1.ROOT.GetOrCreateNode("android/packagingOptions");
+                node1.AppendContentNode("exclude 'META-INF/kotlinx-serialization-json.kotlin_module'");
+                
+                var gradle2 = projectManager.LauncherGradle;
+                var node2 = gradle2.ROOT.GetOrCreateNode("android/packagingOptions");
+                node2.AppendContentNode("exclude 'META-INF/kotlinx-serialization-json.kotlin_module'");
+            }
         }
 
         [iOSXCodeProjectModify(int.MaxValue)]
