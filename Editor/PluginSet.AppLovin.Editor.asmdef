@@ -6,7 +6,9 @@
         "PluginSet.Core.Editor",
         "PluginSet.AppLovin",
         "UnityEditor.UI",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
     ],
     "includePlatforms": [
         "Editor"

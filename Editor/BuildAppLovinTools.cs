@@ -118,6 +118,9 @@ namespace PluginSet.AppLovin.Editor
                 if (name.StartsWith("Yandex/"))
                     return !buildParams.IncludeYandex;
 
+                if (name.StartsWith("Bigo/"))
+                    return !buildParams.IncludeBigo;
+                
                 return false;
             });
         }

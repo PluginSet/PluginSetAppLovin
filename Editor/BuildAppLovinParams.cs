@@ -120,6 +120,9 @@ namespace PluginSet.AppLovin.Editor
         
         [VisibleCaseBoolValue("Enable", true)]
         public bool IncludeYandex;
+        
+        [VisibleCaseBoolValue("Enable", true)]
+        public bool IncludeBigo;
 
         private void OnValidate()
         {

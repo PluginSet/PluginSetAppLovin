@@ -56,6 +56,7 @@ namespace PluginSet.AppLovin
             _bannerAdUnitId = cfg.BannerAdUnitId;
             _rewardAdUnitId = cfg.RewardAdUnitId;
             _interstitialAdUnitId = cfg.InterstitialAdUnitId;
+            
             _openAdUnitId = cfg.OpenAdUnitId;
             
             MaxSdkCallbacks.OnSdkInitializedEvent += InitializeMax;
